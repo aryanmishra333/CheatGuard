@@ -1,0 +1,108 @@
+{
+  "screen_bounds": {
+    "width": 640,
+    "height": 480,
+    "center_x": 320,
+    "center_y": 240
+  },
+  "eye_centers": {
+    "center": [
+      330.25,
+      269.75
+    ],
+    "top_left": [
+      335.0,
+      267.25
+    ],
+    "top_right": [
+      324.0,
+      268.0
+    ],
+    "bottom_left": [
+      335.5,
+      271.75
+    ],
+    "bottom_right": [
+      325.5,
+      272.0
+    ],
+    "top_center": [
+      330.5,
+      267.25
+    ],
+    "bottom_center": [
+      330.0,
+      271.25
+    ],
+    "left_center": [
+      334.5,
+      269.25
+    ],
+    "right_center": [
+      324.75,
+      270.0
+    ]
+  },
+  "calibration_targets": [
+    [
+      320,
+      240,
+      "center"
+    ],
+    [
+      50,
+      50,
+      "top_left"
+    ],
+    [
+      590,
+      50,
+      "top_right"
+    ],
+    [
+      50,
+      430,
+      "bottom_left"
+    ],
+    [
+      590,
+      430,
+      "bottom_right"
+    ],
+    [
+      320,
+      50,
+      "top_center"
+    ],
+    [
+      320,
+      430,
+      "bottom_center"
+    ],
+    [
+      50,
+      240,
+      "left_center"
+    ],
+    [
+      590,
+      240,
+      "right_center"
+    ]
+  ],
+  "eye_range_x": [
+    324.0,
+    335.5
+  ],
+  "eye_range_y": [
+    267.25,
+    272.0
+  ],
+  "center_eye_position": [
+    330.25,
+    269.75
+  ],
+  "calibration_timestamp": 1759129516.2841594,
+  "adaptive_threshold_x": 30,
+  "adaptive_threshold_y": 30
+}

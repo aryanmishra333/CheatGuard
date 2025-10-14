@@ -1,0 +1,15 @@
+__pycache__/
+logs/
+runs/
+yolo_custom/runs/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv/
+venv/
+env/
+.vscode/
+.idea/
+*.pt
+.DS_Store
