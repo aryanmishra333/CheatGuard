@@ -1,0 +1,54 @@
+Timestamp (ms),Detected Objects,Prohibited Objects,Violation Active,Violation Duration,Violation Triggered,Total Violations,Inference Time (ms),Prohibited Count
+1760301987771,"[""Hand"", ""Hand"", ""Phone""]","[""Phone""]",True,0.0,False,0,568.2,1
+1760301988783,"[""Hand""]",[],False,0.0,False,0,555.3,0
+1760301988932,"[""Hand""]",[],False,0.0,False,0,552.2,0
+1760301989495,"[""Hand"", ""Hand"", ""Hand""]",[],False,0.0,False,0,534.2,0
+1760301990045,"[""Hand""]",[],False,0.0,False,0,522.2,0
+1760301991060,"[""Chit"", ""Hand"", ""Hand""]","[""Chit""]",True,0.0,False,0,528.1,1
+1760301991158,"[""Hand"", ""Hand"", ""Hand"", ""Phone""]","[""Phone""]",True,0.0,False,0,526.7,1
+1760301991678,"[""Hand"", ""Hand"", ""Hand""]",[],False,0.0,False,0,506.3,0
+1760301992211,"[""Chit"", ""Hand"", ""Hand""]","[""Chit""]",True,0.0,False,0,520.0,1
+1760301992729,"[""Hand"", ""Hand""]",[],False,0.0,False,0,503.5,0
+1760301993137,"[""Hand"", ""Hand""]",[],False,0.0,False,0,395.5,0
+1760301993576,"[""Hand"", ""Hand""]",[],False,0.0,False,0,416.9,0
+1760301993985,"[""Hand"", ""Hand"", ""Hand""]",[],False,0.0,False,0,384.6,0
+1760301994393,"[""Hand"", ""Hand""]",[],False,0.0,False,0,395.0,0
+1760301995409,"[""Hand""]",[],False,0.0,False,0,391.2,0
+1760301995410,"[""Hand""]",[],False,0.0,False,0,442.9,0
+1760301995760,"[""Hand"", ""Hand"", ""Phone""]","[""Phone""]",True,0.0,False,0,468.9,1
+1760301996228,"[""Hand""]",[],False,0.0,False,0,441.9,0
+1760301996681,"[""Hand"", ""Hand"", ""Phone""]","[""Phone""]",True,0.0,False,0,432.7,1
+1760301997086,"[""Hand"", ""Hand""]",[],False,0.0,False,0,379.1,0
+1760301997521,"[""Hand"", ""Phone""]","[""Phone""]",True,0.0,False,0,414.3,1
+1760301997954,"[""Hand""]",[],False,0.0,False,0,412.7,0
+1760301998391,"[""Hand"", ""Hand""]",[],False,0.0,False,0,418.0,0
+1760301998847,"[""Chit"", ""Hand""]","[""Chit""]",True,0.0,False,0,440.7,1
+1760301999448,"[""Hand""]",[],False,0.0,False,0,588.1,0
+1760302000119,"[""Hand""]",[],False,0.0,False,0,656.7,0
+1760302000699,"[""Hand""]",[],False,0.0,False,0,567.2,0
+1760302001275,"[""Hand""]",[],False,0.0,False,0,558.9,0
+1760302001822,"[""Chit"", ""Hand""]","[""Chit""]",True,0.0,False,0,523.9,1
+1760302002369,"[""Hand"", ""Hand""]",[],False,0.0,False,0,519.1,0
+1760302003031,"[""Chit"", ""Hand"", ""Hand"", ""Phone""]","[""Chit"", ""Phone""]",True,0.0,False,0,645.0,2
+1760302004042,"[""Chit"", ""Chit"", ""Hand"", ""Hand""]","[""Chit"", ""Chit""]",True,0.0,False,0,547.6,2
+1760302004160,"[""Hand""]",[],False,0.0,False,0,548.3,0
+1760302004737,"[""Hand""]",[],False,0.0,False,0,565.5,0
+1760302005319,"[""Chit"", ""Hand"", ""Hand""]","[""Chit""]",True,0.0,False,0,568.5,1
+1760302005876,"[""Hand""]",[],False,0.0,False,0,543.4,0
+1760302006421,"[""Hand""]",[],False,0.0,False,0,534.0,0
+1760302007057,"[""Hand"", ""Hand""]",[],False,0.0,False,0,620.3,0
+1760302007786,"[""Hand"", ""Phone""]","[""Phone""]",True,0.0,False,0,702.9,1
+1760302008858,"[""Hand"", ""Hand"", ""Phone""]","[""Phone""]",True,1.0737521648406982,False,0,1048.5,1
+1760302009891,"[""Hand"", ""Hand""]",[],False,0.0,False,0,1009.9,0
+1760302010866,"[""Hand"", ""Hand""]",[],False,0.0,False,0,952.7,0
+1760302011686,"[""Hand""]",[],False,0.0,False,0,796.8,0
+1760302012477,"[""Hand""]",[],False,0.0,False,0,773.3,0
+1760302013338,"[""Hand"", ""Hand""]",[],False,0.0,False,0,828.6,0
+1760302014043,"[""Hand""]",[],False,0.0,False,0,686.7,0
+1760302014847,"[""Chit"", ""Hand""]","[""Chit""]",True,0.0,False,0,784.7,1
+1760302015590,"[""Hand"", ""Hand""]",[],False,0.0,False,0,721.5,0
+1760302016305,"[""Hand"", ""Hand""]",[],False,0.0,False,0,693.7,0
+1760302017119,"[""Hand"", ""Phone""]","[""Phone""]",True,0.0,False,0,797.6,1
+1760302017854,"[""Chit"", ""Chit"", ""Hand"", ""Hand"", ""Hand""]","[""Chit"", ""Chit""]",True,0.0,False,0,711.1,2
+1760302018390,"[""Hand"", ""Hand"", ""Phone""]","[""Phone""]",True,0.0,False,0,520.4,1
+1760302019007,"[""Hand"", ""Hand""]",[],False,0.0,False,0,602.7,0
