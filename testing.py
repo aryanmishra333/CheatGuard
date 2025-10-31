@@ -1,17 +1,11 @@
+import requests
+import numpy as np
 import cv2
 
-url = "http://192.168.1.2:4747/video"  # same IP shown in your DroidCam app
-
-cap = cv2.VideoCapture(url, cv2.CAP_FFMPEG)
-
 while True:
-    ret, frame = cap.read()
-    if not ret:
-        print("Can't read frame")
+    images = requests.get("http://192.168.1.4:8080/shot.jpg")
+    video = np.array(bytearray(images.content), dtype=np.uint8)
+    render = cv2.imdecode(video, -1)
+    cv2.imshow("frame", render)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
         break
-    cv2.imshow("DroidCam Feed", frame)
-    if cv2.waitKey(1) == ord('q'):
-        break
-
-cap.release()
-cv2.destroyAllWindows()
