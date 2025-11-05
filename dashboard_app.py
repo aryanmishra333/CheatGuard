@@ -130,8 +130,8 @@ import sys
 import os
 
 # --- Configuration ---
-FACE_TRACKING_HOST, FACE_TRACKING_PORT = "127.0.0.1", 9020
-OBJECT_DETECTION_HOST, OBJECT_DETECTION_PORT = "127.0.0.1", 9021
+FACE_TRACKING_HOST, FACE_TRACKING_PORT = "0.0.0.0", 9020  # Listen on all network interfaces
+OBJECT_DETECTION_HOST, OBJECT_DETECTION_PORT = "0.0.0.0", 9021  # Listen on all network interfaces
 # Script names
 FACE_TRACKING_SCRIPT = "main.py"
 OBJECT_DETECTION_SCRIPT = "yolo_detection.py" 
@@ -188,6 +188,19 @@ def start_object_detection_server(q):
 
 st.set_page_config(layout="wide", page_title="Proctoring Dashboard")
 
+# Helper function to get server IP
+def get_server_ip():
+    """Get the IP address of this machine for remote access"""
+    try:
+        import socket
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except:
+        return "127.0.0.1"
+
 # Initialize session state variables
 if 'face_tracking_process' not in st.session_state:
     st.session_state.face_tracking_process = None
@@ -213,6 +226,10 @@ if 'face_tracking_process' not in st.session_state:
 
 st.title("👨‍🏫 Real-Time Proctoring Dashboard")
 st.markdown("This dashboard monitors the eye-tracking script in real-time and provides status updates for invigilators.")
+
+# Display server IP for remote access
+server_ip = get_server_ip()
+st.info(f"🌐 **Remote Access:** Share this URL with proctors: `http://{server_ip}:8501`")
 
 col1, col2 = st.columns([1, 4])
 

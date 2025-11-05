@@ -20,17 +20,35 @@ import os
 import threading
 import re
 import subprocess
+import requests
+import numpy as np
 from datetime import datetime
 from queue import Queue
 
-# Configuration Parameters
-CAMERA_SOURCE = 2  # Default camera source (can be changed)
-CONFIDENCE_THRESHOLD = 0.3  # YOLO detection confidence threshold
-VIOLATION_DURATION = 3.0  # Seconds of continuous detection before violation
-PROHIBITED_OBJECTS = ['Chit', 'Phone', 'Earbuds']  # Objects that trigger violations
-LOG_FOLDER = "logs"  # Folder to store CSV logs
-SOCKET_HOST = "127.0.0.1"  # Dashboard socket host
-SOCKET_PORT = 9021  # Socket port for object detection logs (different from face tracking)
+# Import configuration from config.py
+try:
+    from config import (
+        OBJECT_DETECTION_USE_IP_WEBCAM as USE_IP_WEBCAM,
+        OBJECT_DETECTION_IP_WEBCAM_URL as IP_WEBCAM_URL,
+        OBJECT_DETECTION_CAMERA_SOURCE as CAMERA_SOURCE,
+        YOLO_CONFIDENCE_THRESHOLD as CONFIDENCE_THRESHOLD,
+        OBJECT_VIOLATION_DURATION as VIOLATION_DURATION,
+        PROHIBITED_OBJECTS,
+        LOG_FOLDER,
+        OBJECT_DETECTION_SOCKET_HOST as SOCKET_HOST,
+        OBJECT_DETECTION_SOCKET_PORT as SOCKET_PORT
+    )
+except ImportError:
+    # Fallback configuration if config.py not available
+    USE_IP_WEBCAM = False  # Using CAMO - phone appears as Camera 1
+    IP_WEBCAM_URL = ""  # Not needed with CAMO
+    CAMERA_SOURCE = 1  # Desk-facing camera (phone via CAMO USB)
+    CONFIDENCE_THRESHOLD = 0.3
+    VIOLATION_DURATION = 3.0
+    PROHIBITED_OBJECTS = ['Chit', 'Phone', 'Earbuds']
+    LOG_FOLDER = "logs"
+    SOCKET_HOST = "127.0.0.1"
+    SOCKET_PORT = 9021
 
 # Global state variables
 current_prohibited = []
@@ -39,6 +57,37 @@ violation_triggered = False
 violation_count = 0
 detection_active = True
 csv_data = []
+
+def get_ip_webcam_frame(url, timeout=5):
+    """
+    Fetch a frame from IP webcam (phone camera).
+    
+    Args:
+        url: The IP webcam URL
+        timeout: Request timeout in seconds
+        
+    Returns:
+        frame: OpenCV frame or None if failed
+    """
+    try:
+        response = requests.get(url, timeout=timeout)
+        if response.status_code == 200:
+            image_array = np.array(bytearray(response.content), dtype=np.uint8)
+            frame = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
+            return frame
+        else:
+            print(f"Failed to fetch frame: HTTP {response.status_code}")
+            return None
+    except requests.exceptions.Timeout:
+        print(f"Timeout fetching frame from {url}")
+        return None
+    except requests.exceptions.ConnectionError:
+        print(f"Connection error to {url}")
+        return None
+    except Exception as e:
+        print(f"Error fetching IP webcam frame: {e}")
+        return None
+
 
 def setup_logging():
     """Configure logging to send to the dashboard server."""
@@ -296,7 +345,7 @@ def run_yolo_detection():
     
     print("🎯 YOLO OBJECT DETECTION FOR PROCTORING")
     print("=" * 50)
-    print(f"Camera Source: {CAMERA_SOURCE}")
+    print(f"Camera Source: Camera {CAMERA_SOURCE} (Phone via CAMO USB)")
     print(f"Confidence Threshold: {CONFIDENCE_THRESHOLD}")
     print(f"Violation Duration: {VIOLATION_DURATION}s")
     print(f"Prohibited Objects: {', '.join(PROHIBITED_OBJECTS)}")
@@ -311,7 +360,14 @@ def run_yolo_detection():
             return
         
         print("🚀 Starting YOLO object detection...")
+        print(f"📱 Using Camera {CAMERA_SOURCE} (Phone via CAMO)")
+        print("   Make sure CAMO is running and phone is connected via USB")
         print("Press Ctrl+C to stop detection and save logs")
+        
+        # Set environment variables for the subprocess
+        env = os.environ.copy()
+        env['USE_IP_WEBCAM'] = str(USE_IP_WEBCAM)
+        env['IP_WEBCAM_URL'] = IP_WEBCAM_URL
         
         # Start YOLO process and capture output
         process = subprocess.Popen(
@@ -321,7 +377,8 @@ def run_yolo_detection():
             text=True,
             bufsize=1,
             universal_newlines=True,
-            cwd=os.path.dirname(__file__) or None
+            cwd=os.path.dirname(__file__) or None,
+            env=env
         )
         
         # Function to read YOLO output

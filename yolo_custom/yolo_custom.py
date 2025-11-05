@@ -1,18 +1,3 @@
-# # import torch
-# # from ultralytics import YOLO
-
-# # # Check if GPU is available and select device
-# # device = "cuda" if torch.cuda.is_available() else "cpu"
-# # print(f"Using device: {device}")
-
-# # # Load the YOLO model and move it to the selected device
-# # model = YOLO("644_img.pt").to(device)
-
-# # # Perform inference using the specified device
-# # results = model(source=1, show=True, conf=0.3, save=True)
-
-
-
 import torch
 from ultralytics import YOLO
 
@@ -27,4 +12,4 @@ model = YOLO("644_img.pt")  # No 'device' argument here
 model.to(device)
 
 # Perform inference using the specified device
-results = model(source=0, show=True, conf=0.3, save=True)
+results = model(source=1, show=True, conf=0.3, save=True)
