@@ -235,6 +235,15 @@ else:
         if status_data:
             st.session_state.status_data = status_data
             
+            # Safety: Ensure all expected keys exist with defaults
+            status_data.setdefault('status', 'Unknown')
+            status_data.setdefault('face_tracking_running', False)
+            status_data.setdefault('object_detection_running', False)
+            status_data.setdefault('face_violations', 0)
+            status_data.setdefault('object_violations', 0)
+            status_data.setdefault('total_violations', 0)
+            status_data.setdefault('recent_events', [])
+            
             # Status indicator
             status = status_data.get('status', 'Unknown')
             status_class = status.lower()
@@ -268,6 +277,9 @@ else:
             with col4:
                 face_running = status_data.get('face_tracking_running', False)
                 object_running = status_data.get('object_detection_running', False)
+                # Ensure booleans, not None
+                face_running = bool(face_running) if face_running is not None else False
+                object_running = bool(object_running) if object_running is not None else False
                 modules_running = sum([face_running, object_running])
                 st.metric(
                     "Active Modules",
