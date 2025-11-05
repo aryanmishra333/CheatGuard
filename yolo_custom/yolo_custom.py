@@ -2,6 +2,7 @@ import torch
 from ultralytics import YOLO
 import os
 import sys
+import cv2
 
 # Check if GPU is available and select device
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -31,10 +32,60 @@ camera_source = int(os.environ.get('CAMERA_SOURCE', '1'))
 print(f"Using camera source: {camera_source}")
 
 try:
-    # Perform inference using the specified device
-    print(f"Starting detection...")
-    results = model(source=camera_source, show=True, conf=0.3, save=True)
-    print("✅ Detection completed successfully")
+    print(f"Starting continuous detection...")
+    print(f"Press 'q' to quit")
+    
+    # Open video capture
+    cap = cv2.VideoCapture(camera_source)
+    
+    if not cap.isOpened():
+        print(f"❌ Error: Could not open camera source {camera_source}")
+        print("   Make sure CAMO Studio is running and phone is connected")
+        sys.exit(1)
+    
+    print(f"✅ Camera opened successfully")
+    
+    frame_count = 0
+    
+    # Continuous detection loop
+    while True:
+        ret, frame = cap.read()
+        
+        if not ret:
+            print("⚠️  Warning: Failed to read frame")
+            break
+        
+        frame_count += 1
+        
+        # Run YOLO detection on frame
+        results = model(frame, conf=0.3, verbose=False)
+        
+        # Get annotated frame
+        annotated_frame = results[0].plot()
+        
+        # Display frame
+        cv2.imshow('YOLO Object Detection', annotated_frame)
+        
+        # Print detection info every 30 frames
+        if frame_count % 30 == 0:
+            detections = results[0].boxes
+            if len(detections) > 0:
+                detected_classes = [results[0].names[int(box.cls)] for box in detections]
+                print(f"Frame {frame_count}: Detected {', '.join(detected_classes)}")
+        
+        # Exit on 'q' key
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            print("\n⚠️  Stopping detection...")
+            break
+    
+    # Cleanup
+    cap.release()
+    cv2.destroyAllWindows()
+    print("✅ Detection stopped")
+    
+except KeyboardInterrupt:
+    print("\n⚠️  Interrupted by user")
+    sys.exit(0)
 except Exception as e:
     print(f"❌ Error during detection: {e}")
     import traceback
