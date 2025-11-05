@@ -23,7 +23,7 @@ import subprocess
 import requests
 import numpy as np
 from datetime import datetime
-from queue import Queue
+from queue import Queue, Empty as QueueEmpty
 
 # Import configuration from config.py
 try:
@@ -405,6 +405,9 @@ def run_yolo_detection():
                     # Get output from YOLO
                     line = output_queue.get(timeout=1.0)
                     
+                    # ALWAYS print the raw output for visibility
+                    print(f"[YOLO] {line}")
+                    
                     # Parse and analyze the detection
                     detection_data = parse_yolo_output(line)
                     if detection_data:  # Only process valid detections
@@ -417,8 +420,12 @@ def run_yolo_detection():
                         objects_str = ', '.join(detection_data['detected_objects'])
                         print(f"Detected: {objects_str} | Prohibited: {', '.join(analysis_result['prohibited_detected']) or 'None'}")
                     
+                except QueueEmpty:
+                    # Timeout - this is normal, continue
+                    continue
                 except Exception as e:
-                    # Timeout or other error - continue
+                    # Other error - print and continue
+                    print(f"Error processing YOLO output: {e}")
                     continue
                     
         except KeyboardInterrupt:
