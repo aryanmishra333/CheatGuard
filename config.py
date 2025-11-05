@@ -11,9 +11,9 @@ Centralized configuration for both camera feeds and detection systems
 FACE_TRACKING_CAMERA_SOURCE = 0  # Usually 0 for built-in webcam
 
 # Object Detection Camera (Desk View - Phone/IP Webcam)
-OBJECT_DETECTION_USE_IP_WEBCAM = True  # Set to False to use regular camera
+OBJECT_DETECTION_USE_IP_WEBCAM = False  # Set to False to use regular camera
 OBJECT_DETECTION_IP_WEBCAM_URL = "http://192.168.1.13:8080/video"  # Your phone's IP (28.4 FPS confirmed!)
-OBJECT_DETECTION_CAMERA_SOURCE = 2  # Fallback if IP webcam fails
+OBJECT_DETECTION_CAMERA_SOURCE = 1  # Fallback if IP webcam fails
 
 # Performance Optimization (for IP Webcam)
 FRAME_SKIP = 2  # Process every Nth frame (1=all, 2=half, 3=third) - reduces CPU load

@@ -58,21 +58,14 @@ try:
         frame_count += 1
         
         # Run YOLO detection on frame
-        results = model(frame, conf=0.3, verbose=False)
-        
+        results = model(frame, conf=0.3, verbose=True)
+
         # Get annotated frame
         annotated_frame = results[0].plot()
-        
+
         # Display frame
         cv2.imshow('YOLO Object Detection', annotated_frame)
-        
-        # Print detection info every 30 frames
-        if frame_count % 30 == 0:
-            detections = results[0].boxes
-            if len(detections) > 0:
-                detected_classes = [results[0].names[int(box.cls)] for box in detections]
-                print(f"Frame {frame_count}: Detected {', '.join(detected_classes)}")
-        
+
         # Exit on 'q' key
         if cv2.waitKey(1) & 0xFF == ord('q'):
             print("\n⚠️  Stopping detection...")
