@@ -92,17 +92,19 @@ class LogRecordSocketReceiver(socketserver.ThreadingTCPServer):
 def start_log_servers():
     """Start both log receiving servers"""
     def run_face_server():
-        state.face_log_server = LogRecordSocketReceiver("0.0.0.0", 9020, "face")
+        # Listen on 127.0.0.1 because detection scripts send to localhost
+        state.face_log_server = LogRecordSocketReceiver("127.0.0.1", 9020, "face")
         state.face_log_server.serve_forever()
     
     def run_object_server():
-        state.object_log_server = LogRecordSocketReceiver("0.0.0.0", 9021, "object")
+        # Listen on 127.0.0.1 because detection scripts send to localhost
+        state.object_log_server = LogRecordSocketReceiver("127.0.0.1", 9021, "object")
         state.object_log_server.serve_forever()
     
     threading.Thread(target=run_face_server, daemon=True).start()
     threading.Thread(target=run_object_server, daemon=True).start()
     time.sleep(1)
-    print("✅ Log servers started on ports 9020 and 9021")
+    print("✅ Log servers started on 127.0.0.1:9020 and 127.0.0.1:9021")
 
 def process_logs():
     """Background thread to process incoming logs"""
@@ -166,6 +168,15 @@ def get_status():
     face_running = state.face_tracking_process and state.face_tracking_process.poll() is None
     object_running = state.object_detection_process and state.object_detection_process.poll() is None
     
+    # Check if processes died unexpectedly
+    if state.face_tracking_process and not face_running:
+        print(f"⚠️  Face tracking process died! Exit code: {state.face_tracking_process.returncode}")
+        state.face_tracking_process = None
+    
+    if state.object_detection_process and not object_running:
+        print(f"⚠️  Object detection process died! Exit code: {state.object_detection_process.returncode}")
+        state.object_detection_process = None
+    
     # Determine overall status
     if face_running and object_running:
         status = "Running"
@@ -220,25 +231,39 @@ def start_monitoring():
         if not os.path.exists('yolo_detection.py'):
             return jsonify({'success': False, 'message': 'yolo_detection.py not found'}), 404
         
-        # Start face tracking
+        # Start face tracking (without capturing output to prevent freezing)
+        print("🚀 Starting face tracking (main.py)...")
         state.face_tracking_process = subprocess.Popen(
             [sys.executable, 'main.py'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            creationflags=subprocess.CREATE_NEW_CONSOLE if sys.platform == 'win32' else 0
         )
         
-        time.sleep(2)
+        # Check if it started
+        time.sleep(3)
+        if state.face_tracking_process.poll() is not None:
+            print("❌ Face tracking failed to start!")
+            state.face_tracking_process = None
+            return jsonify({'success': False, 'message': 'Face tracking failed to start'}), 500
+        
+        print("✅ Face tracking started")
         
         # Start object detection
+        print("🚀 Starting object detection (yolo_detection.py)...")
         state.object_detection_process = subprocess.Popen(
             [sys.executable, 'yolo_detection.py'],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-            bufsize=1
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            creationflags=subprocess.CREATE_NEW_CONSOLE if sys.platform == 'win32' else 0
         )
+        
+        # Check if it started
+        time.sleep(3)
+        if state.object_detection_process.poll() is not None:
+            print("❌ Object detection failed to start!")
+            state.object_detection_process = None
+            return jsonify({'success': False, 'message': 'Object detection failed to start'}), 500
+        
+        print("✅ Object detection started")
         
         state.status = "Running"
         event = {
