@@ -368,6 +368,7 @@ def run_yolo_detection():
         env = os.environ.copy()
         env['USE_IP_WEBCAM'] = str(USE_IP_WEBCAM)
         env['IP_WEBCAM_URL'] = IP_WEBCAM_URL
+        env['CAMERA_SOURCE'] = str(CAMERA_SOURCE)  # Pass camera source to yolo_custom.py
         
         # Start YOLO process and capture output
         process = subprocess.Popen(

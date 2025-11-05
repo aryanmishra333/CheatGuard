@@ -40,6 +40,20 @@ class SystemState:
         self.recent_events = []
         self.server_ip = self.get_local_ip()
         
+        # Decision Engine State
+        self.is_cheating = False
+        self.cheating_confidence = 0.0
+        self.cheating_reason = ""
+        self.violation_history = []
+        self.was_cheating = False
+        
+        # Decision Thresholds
+        self.FACE_VIOLATION_THRESHOLD = 3
+        self.OBJECT_VIOLATION_THRESHOLD = 1
+        self.TIME_WINDOW = 300  # 5 minutes in seconds
+        self.COMBINED_THRESHOLD = 5
+        self.CONFIDENCE_THRESHOLD = 0.7  # 70% confidence to flag as cheating
+        
     def get_local_ip(self):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -51,6 +65,58 @@ class SystemState:
             return "127.0.0.1"
 
 state = SystemState()
+
+# ============================================================================
+# DECISION ENGINE
+# ============================================================================
+
+def make_cheating_decision(state):
+    """
+    Centralized decision engine - analyzes all violations and determines if student is cheating.
+    
+    Returns:
+        tuple: (is_cheating: bool, confidence: float, reason: str)
+    """
+    current_time = time.time()
+    
+    # Filter violations within time window (last 5 minutes)
+    recent_violations = [
+        v for v in state.violation_history 
+        if current_time - v['timestamp'] <= state.TIME_WINDOW
+    ]
+    
+    # Count violations by type
+    recent_face = sum(1 for v in recent_violations if v['type'] == 'face')
+    recent_object = sum(1 for v in recent_violations if v['type'] == 'object')
+    total_recent = recent_face + recent_object
+    
+    # Decision Logic with weighted confidence scoring
+    reasons = []
+    confidence = 0.0
+    
+    # Rule 1: Multiple face violations (looking away repeatedly)
+    if recent_face >= state.FACE_VIOLATION_THRESHOLD:
+        confidence += 0.4
+        reasons.append(f"{recent_face} gaze violations")
+    
+    # Rule 2: Prohibited objects detected (phone, chit, earbuds)
+    if recent_object >= state.OBJECT_VIOLATION_THRESHOLD:
+        confidence += 0.5
+        reasons.append(f"{recent_object} prohibited object(s)")
+    
+    # Rule 3: Combined violations (pattern of multiple issues)
+    if total_recent >= state.COMBINED_THRESHOLD:
+        confidence += 0.3
+        reasons.append(f"suspicious pattern ({total_recent} total)")
+    
+    # Cap confidence at 100%
+    confidence = min(1.0, confidence)
+    
+    # Make final decision based on confidence threshold
+    is_cheating = confidence >= state.CONFIDENCE_THRESHOLD
+    reason = " + ".join(reasons) if reasons else "No violations detected"
+    
+    return is_cheating, confidence, reason
 
 # ============================================================================
 # LOG RECEIVING SERVERS (Same as dashboard_app.py)
@@ -107,7 +173,7 @@ def start_log_servers():
     print("✅ Log servers started on 127.0.0.1:9020 and 127.0.0.1:9021")
 
 def process_logs():
-    """Background thread to process incoming logs"""
+    """Background thread to process incoming logs and make cheating decisions"""
     while True:
         try:
             # Process face tracking logs
@@ -121,6 +187,14 @@ def process_logs():
                     state.face_violations = getattr(record, 'violation_count', 0)
                     gaze_dir = getattr(record, 'gaze_direction', 'unknown')
                     dur = float(getattr(record, 'violation_duration', 0.0))
+                    
+                    # Add to violation history for decision engine
+                    state.violation_history.append({
+                        'type': 'face',
+                        'timestamp': time.time(),
+                        'details': f"Looking {gaze_dir} for {dur:.1f}s"
+                    })
+                    
                     event = {
                         'timestamp': time.strftime('%H:%M:%S'),
                         'type': 'face_violation',
@@ -142,6 +216,14 @@ def process_logs():
                     state.object_violations = getattr(record, 'violation_count', 0)
                     prohibited = getattr(record, 'prohibited_objects', [])
                     dur = float(getattr(record, 'violation_duration', 0.0))
+                    
+                    # Add to violation history for decision engine
+                    state.violation_history.append({
+                        'type': 'object',
+                        'timestamp': time.time(),
+                        'details': f"{', '.join(prohibited)} detected for {dur:.1f}s"
+                    })
+                    
                     event = {
                         'timestamp': time.strftime('%H:%M:%S'),
                         'type': 'object_violation',
@@ -151,6 +233,44 @@ def process_logs():
                     state.recent_events.insert(0, event)
                     if len(state.recent_events) > 50:
                         state.recent_events = state.recent_events[:50]
+            
+            # ⭐ RUN DECISION ENGINE ⭐
+            is_cheating, confidence, reason = make_cheating_decision(state)
+            
+            # Update state
+            state.is_cheating = is_cheating
+            state.cheating_confidence = confidence
+            state.cheating_reason = reason
+            
+            # Alert when cheating status changes
+            if is_cheating and not state.was_cheating:
+                print(f"\n{'='*70}")
+                print(f"🚨 CHEATING DETECTED!")
+                print(f"{'='*70}")
+                print(f"Confidence: {confidence*100:.0f}%")
+                print(f"Reason: {reason}")
+                print(f"{'='*70}\n")
+                
+                # Add to events
+                event = {
+                    'timestamp': time.strftime('%H:%M:%S'),
+                    'type': 'cheating_alert',
+                    'message': f"🚨 CHEATING DETECTED: {reason} ({confidence*100:.0f}% confidence)",
+                    'severity': 'critical'
+                }
+                state.recent_events.insert(0, event)
+                
+            elif not is_cheating and state.was_cheating:
+                print(f"\n✅ Cheating status cleared (confidence dropped below threshold)\n")
+                event = {
+                    'timestamp': time.strftime('%H:%M:%S'),
+                    'type': 'status_clear',
+                    'message': f"✅ Cheating status cleared",
+                    'severity': 'info'
+                }
+                state.recent_events.insert(0, event)
+            
+            state.was_cheating = is_cheating
             
             time.sleep(0.1)
             
@@ -194,7 +314,13 @@ def get_status():
         'object_violations': state.object_violations,
         'total_violations': state.face_violations + state.object_violations,
         'recent_events': state.recent_events[:20],
-        'timestamp': datetime.now().isoformat()
+        'timestamp': datetime.now().isoformat(),
+        
+        # ⭐ Decision Engine Results ⭐
+        'is_cheating': state.is_cheating,
+        'cheating_confidence': round(state.cheating_confidence * 100, 1),
+        'cheating_reason': state.cheating_reason,
+        'violation_history_count': len(state.violation_history)
     }
     
     # Add face tracking data if available

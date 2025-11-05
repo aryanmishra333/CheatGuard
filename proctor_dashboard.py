@@ -252,6 +252,22 @@ else:
                 unsafe_allow_html=True
             )
             
+            # ⭐ CHEATING DETECTION ALERT ⭐
+            is_cheating = status_data.get('is_cheating', False)
+            cheating_confidence = status_data.get('cheating_confidence', 0)
+            cheating_reason = status_data.get('cheating_reason', '')
+            
+            if is_cheating:
+                st.error(f"### 🚨 CHEATING DETECTED - {cheating_confidence}% CONFIDENCE")
+                st.warning(f"**Reason:** {cheating_reason}")
+                st.warning(f"**Action Required:** Review footage and flag this exam session")
+            else:
+                st.success("### ✅ No cheating detected")
+                if cheating_confidence > 0:
+                    st.info(f"Suspicion level: {cheating_confidence}% (threshold: 70%)")
+            
+            st.markdown("---")
+            
             # Main metrics
             col1, col2, col3, col4 = st.columns(4)
             
