@@ -101,7 +101,7 @@ def make_cheating_decision(state):
     
     # Rule 2: Prohibited objects detected (phone, chit, earbuds)
     if recent_object >= state.OBJECT_VIOLATION_THRESHOLD:
-        confidence += 0.5
+        confidence += 0.7
         reasons.append(f"{recent_object} prohibited object(s)")
     
     # Rule 3: Combined violations (pattern of multiple issues)
