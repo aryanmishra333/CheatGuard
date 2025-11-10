@@ -170,7 +170,7 @@ SERVER_ADDRESS = (SERVER_IP, 7070)
 
 # Proctoring System Variables
 GAZE_THRESHOLD_ANGLE = 15  # Degrees to consider as left/right/up gaze away from monitor
-GAZE_ALERT_DURATION = 10  # Seconds to trigger alert (as requested)
+GAZE_ALERT_DURATION = 5  # Seconds to trigger alert (as requested)
 last_gaze_direction = None  # 'left', 'right', 'up', or None
 gaze_start_time = None  # Time when current gaze direction started
 alert_triggered = False  # To avoid repeated alerts
