@@ -58,7 +58,7 @@ try:
         frame_count += 1
         
         # Run YOLO detection on frame
-        results = model(frame, conf=0.3, verbose=True)
+        results = model(frame, conf=0.3, verbose=True, classes=[0])
 
         # Get annotated frame
         annotated_frame = results[0].plot()
