@@ -260,7 +260,6 @@ else:
             if is_cheating:
                 st.error(f"### 🚨 CHEATING DETECTED - {cheating_confidence}% CONFIDENCE")
                 st.warning(f"**Reason:** {cheating_reason}")
-                st.warning(f"**Action Required:** Review footage and flag this exam session")
             else:
                 st.success("### ✅ No cheating detected")
                 if cheating_confidence > 0:

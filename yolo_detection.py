@@ -44,7 +44,7 @@ except ImportError:
     IP_WEBCAM_URL = ""  # Not needed with CAMO
     CAMERA_SOURCE = 1  # Desk-facing camera (phone via CAMO USB)
     CONFIDENCE_THRESHOLD = 0.3
-    VIOLATION_DURATION = 3.0
+    VIOLATION_DURATION = 5.0
     PROHIBITED_OBJECTS = ['Chit', 'Phone', 'Earbuds']
     LOG_FOLDER = "logs"
     SOCKET_HOST = "127.0.0.1"
