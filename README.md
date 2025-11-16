@@ -2,22 +2,6 @@
 
 An intelligent AI-powered proctoring system that uses computer vision and machine learning to detect suspicious behavior during online examinations.
 
-## 📋 Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [System Architecture](#system-architecture)
-- [Technologies Used](#technologies-used)
-- [Installation](#installation)
-- [Configuration](#configuration)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [Detection Modules](#detection-modules)
-- [Dashboard](#dashboard)
-- [Logging](#logging)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## 🎯 Overview
 
